@@ -38,6 +38,7 @@ app.get("/api/image-resize", async (req, res) => {
 
   // 파일 확장자 및 기본 이름 추출
   const fileExtension = path.extname(filePath).substring(1).toLowerCase();
+  console.log("fileExtension:", fileExtension);
 
   // 지원되지 않는 파일 형식 확인
   if (!SUPPORTED_IMAGE_TYPES.includes(fileExtension)) {
@@ -45,6 +46,8 @@ app.get("/api/image-resize", async (req, res) => {
   }
 
   // 파일 경로 유효성 검사
+  const decodedURI = decodeURI(filePath);
+  console.log("decodedURI:", decodedURI);
   if (fs.ensureFileSync(filePath)) {
     return res.status(404).send("파일을 찾을 수 없습니다.");
   }
@@ -53,7 +56,10 @@ app.get("/api/image-resize", async (req, res) => {
   // 2. 변환된 이미지가 없다면 이미지 변환
   const outputPath = path.join(OUTPUT_PATH, size, uuidv4());
   console.log("outputPath:", outputPath);
-  await sharp(filePath).toFormat("webp").toFile(outputPath);
+  await sharp(filePath)
+    .resize(920)
+    .webp()
+    .toFile(outputPath + ".webp");
 });
 
 app.listen(PORT, () => console.log(`app is running on port ${PORT}`));
