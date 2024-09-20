@@ -54,12 +54,13 @@ app.get("/api/image-resize", async (req, res) => {
 
   // 1. 이미 이미지가 변환되었는지 확인
   // 2. 변환된 이미지가 없다면 이미지 변환
-  const outputPath = path.join(OUTPUT_PATH, size, uuidv4());
+  const outputPath = path.join(OUTPUT_PATH, size, uuidv4()) + ".webp";
   console.log("outputPath:", outputPath);
-  await sharp(filePath)
-    .resize(920)
-    .webp()
-    .toFile(outputPath + ".webp");
+  const metadata = await sharp(filePath).metadata();
+
+  await sharp(filePath).resize(3000).webp({ quality: 50 }).toFile(outputPath);
+
+  res.status(200).send(`이미지 변환 완료. file path = [${outputPath}]`);
 });
 
 app.listen(PORT, () => console.log(`app is running on port ${PORT}`));
